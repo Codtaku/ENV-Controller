@@ -1,0 +1,8 @@
+{
+  "temp_min": 25.0,
+  "temp_max": 32.0,
+  "hum_min": 60,
+  "hum_max": 85,
+  "gas_limit": 700,
+  "relay_delay": 10
+}
