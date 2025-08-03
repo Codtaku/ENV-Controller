@@ -48,6 +48,7 @@ function updateUI(data) {
     document.getElementById('val-hum').innerText = `${data.hum} %`;
     document.getElementById('val-gas').innerText = data.gas;
     document.getElementById('val-soil').innerText = `${data.soil} %`;
+    document.getElementById('current-ssid').innerText = data.ssid;
     if (gaugeTemp) gaugeTemp.set(data.temp);
     if (gaugeHum) gaugeHum.set(data.hum);
     if (gaugeGas) gaugeGas.set(data.gas);
@@ -116,6 +117,25 @@ function rebootDevice() {
 function resetWifi() {
     if (confirm("Cảnh báo: Thao tác này sẽ xóa toàn bộ cài đặt Wi-Fi đã lưu và khởi động lại thiết bị. Bạn có chắc chắn?")) {
         fetch('/resetwifi').then(response => response.text()).then(data => { alert(data + " Vui lòng kết nối vào mạng 'Broker-Setup-Portal' để cài đặt lại."); }).catch(error => console.error('Error resetting WiFi:', error));
+    }
+}
+
+function saveWifiSettings() {
+    const ssid = document.getElementById('wifi-ssid-input').value;
+    const pass = document.getElementById('wifi-pass-input').value;
+
+    if (!ssid) {
+        alert("New SSID cannot be empty.");
+        return;
+    }
+    
+    if (confirm(`Bạn có chắc muốn đổi Wi-Fi sang "${ssid}"?\nThiết bị sẽ khởi động lại.`)) {
+        fetch(`/setwifi?ssid=${ssid}&pass=${pass}`)
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+            })
+            .catch(error => console.error('Error saving WiFi settings:', error));
     }
 }
 

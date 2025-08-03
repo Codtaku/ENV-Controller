@@ -12,12 +12,14 @@ void handleStatusRequest(AsyncWebServerRequest *request) {
     DynamicJsonDocument doc(1024);
     
     doc["ip"] = WiFi.localIP().toString();
+    doc["ssid"] = g_wifi_ssid;
     doc["temp"] = g_currentTemp;
     doc["hum"] = g_currentHum;
     doc["gas"] = g_currentGas;
     doc["soil"] = g_currentSoil;
     doc["mode"] = modeToString(g_currentMode);
     doc["mode_val"] = g_currentMode;
+    
 
     JsonArray relays = doc.createNestedArray("relays");
     for(int i=0; i<5; i++) {
@@ -122,7 +124,20 @@ void initWebServer() {
         delay(1000);
         ESP.restart();
     });
-
+    server.on("/setwifi", HTTP_GET, [](AsyncWebServerRequest *request){
+        if (request->hasParam("ssid")) {
+            g_wifi_ssid = request->getParam("ssid")->value();
+            if (request->hasParam("pass")) {
+                g_wifi_pass = request->getParam("pass")->value();
+            }
+            saveSettings();
+            request->send(200, "text/plain", "Da luu. Dang khoi dong lai...");
+            delay(1000);
+            ESP.restart();
+        } else {
+            request->send(400, "text/plain", "Bad Request: Missing SSID");
+        }
+    });
     server.begin();
     Serial.println("Web Server started.");
 }

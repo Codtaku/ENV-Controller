@@ -1,13 +1,17 @@
 #include <Arduino.h>
-#include "SPIFFS.h" // << THAY ĐỔI
+#include "SPIFFS.h"
 #include <ArduinoJson.h>
 #include "SettingsManager.h"
 #include "LcdUi.h" 
 
+// >> THÊM ĐỊNH NGHĨA BIẾN TẠI ĐÂY <<
+String g_wifi_ssid = "";
+String g_wifi_pass = "";
+
 const char* CONFIG_FILE = "/config.json";
 
 void loadSettings() {
-    File configFile = SPIFFS.open(CONFIG_FILE, "r"); // << THAY ĐỔI
+    File configFile = SPIFFS.open(CONFIG_FILE, "r");
     if (!configFile) {
         Serial.println("Failed to open config file for reading. Using default values.");
         return;
@@ -19,6 +23,10 @@ void loadSettings() {
         Serial.println("Failed to parse config file. Using default values.");
         return;
     }
+    
+    // Đọc giá trị wifi từ file
+    g_wifi_ssid = doc["wifi_ssid"] | "";
+    g_wifi_pass = doc["wifi_pass"] | "";
 
     g_tempMin = doc["temp_min"] | 25.0;
     g_tempMax = doc["temp_max"] | 32.0;
@@ -32,13 +40,17 @@ void loadSettings() {
 }
 
 void saveSettings() {
-    File configFile = SPIFFS.open(CONFIG_FILE, "w"); // << THAY ĐỔI
+    File configFile = SPIFFS.open(CONFIG_FILE, "w");
     if (!configFile) {
         Serial.println("Failed to open config file for writing.");
         return;
     }
 
     StaticJsonDocument<512> doc;
+    // Lưu giá trị wifi vào file
+    doc["wifi_ssid"] = g_wifi_ssid;
+    doc["wifi_pass"] = g_wifi_pass;
+
     doc["temp_min"] = g_tempMin;
     doc["temp_max"] = g_tempMax;
     doc["hum_min"] = g_humMin;
@@ -56,7 +68,7 @@ void saveSettings() {
 
 
 void setupSettings() {
-    if (!SPIFFS.begin(true)) { // << THAY ĐỔI (true để format nếu không mount được)
+    if (!SPIFFS.begin(true)) {
         Serial.println("An Error has occurred while mounting SPIFFS");
         return;
     }

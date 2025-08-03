@@ -1,6 +1,8 @@
 #ifndef LCD_UI_H
 #define LCD_UI_H
 
+#include <LiquidCrystal_I2C.h>
+
 // Định nghĩa các trạng thái của giao diện
 enum UiMode {
     UI_MODE_STATUS,
@@ -15,7 +17,9 @@ enum UiMode {
 enum SystemMode { AUTO, ON, OFF, HALF, TIMER, MANUAL };
 
 // >> KHAI BÁO BIẾN DÙNG CHUNG VỚI "extern" <<
-// Báo cho các file khác biết về sự tồn tại của các biến này
+extern LiquidCrystal_I2C lcd;
+extern String g_wifi_ssid; // << THÊM VÀO
+extern String g_wifi_pass; // << THÊM VÀO
 extern SystemMode g_currentMode;
 extern bool g_relayStatus[5];
 extern float g_tempMin, g_tempMax;
@@ -24,7 +28,6 @@ extern int g_gasLimit, g_relayDelay;
 extern float g_currentTemp, g_currentHum;
 extern int g_currentGas, g_currentSoil;
 extern int NUM_RELAYS;
-
 
 void setupLcd();
 void loopLcd();

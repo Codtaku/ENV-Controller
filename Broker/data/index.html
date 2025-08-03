@@ -142,7 +142,23 @@
                 </div>
                 <button onclick="saveSettings()">Save Settings</button>
             </div>
-             <div class="card">
+            <div class="card">
+                <h2>Network Configuration</h2>
+                <div class="setting">
+                    <strong>Current SSID:</strong>
+                    <span id="current-ssid">--</span>
+                </div>
+                 <div class="setting">
+                    <strong>New SSID:</strong>
+                    <input type="text" id="wifi-ssid-input" placeholder="Enter new SSID">
+                </div>
+                 <div class="setting">
+                    <strong>New Password:</strong>
+                    <input type="password" id="wifi-pass-input" placeholder="Leave blank to keep old">
+                </div>
+                <button onclick="saveWifiSettings()">Save WiFi & Reboot</button>
+            </div>
+            <div class="card">
                 <h2>System Actions</h2>
                 <button onclick="rebootDevice()" class="btn-danger">Reboot ESP32</button>
                 <button onclick="resetWifi()" class="btn-danger" style="margin-top: 10px;">Reset WiFi Settings</button>
