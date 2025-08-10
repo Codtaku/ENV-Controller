@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Controller</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Environmental Controller</div>
+        <div class="navbar-ip" id="nav-ip">IP: Loading...</div>
+    </nav>
+
+    <div class="container">
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'Dashboard')">Dashboard</button>
+            <button class="tablinks" onclick="openTab(event, 'Settings')">Settings</button>
+        </div>
+
+        <div id="Dashboard" class="tabcontent" style="display: block;">
+            <div class="card">
+                <h2>Live Readings</h2>
+                <div class="gauges-grid">
+                    <div class="gauge-container">
+                        <canvas id="gauge-temp"></canvas>
+                        <div class="gauge-value" id="val-temp">-- &deg;C</div>
+                        <strong>Nhiệt độ</strong>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="gauge-hum"></canvas>
+                        <div class="gauge-value" id="val-hum">-- %</div>
+                        <strong>Độ ẩm KK</strong>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="gauge-gas"></canvas>
+                        <div class="gauge-value" id="val-gas">--</div>
+                        <strong>Khí Gas</strong>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="gauge-soil"></canvas>
+                        <div class="gauge-value" id="val-soil">-- %</div>
+                        <strong>Độ ẩm đất</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>System Status</h2>
+                <div class="status-item"><strong>Chế độ:</strong> <span id="val-mode">--</span></div>
+                <hr>
+                <div class="status-grid">
+                    <div class="status-item"><strong>Đèn 1:</strong> <span id="val-r1" class="value off">OFF</span></div>
+                    <div class="status-item"><strong>Đèn 2:</strong> <span id="val-r2" class="value off">OFF</span></div>
+                    <div class="status-item"><strong>Quạt 1:</strong> <span id="val-r3" class="value off">OFF</span></div>
+                    <div class="status-item"><strong>Quạt 2:</strong> <span id="val-r4" class="value off">OFF</span></div>
+                    <div class="status-item"><strong>Quạt 3:</strong> <span id="val-r5" class="value off">OFF</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="Settings" class="tabcontent">
+            <div class="card">
+                <h2>Control & Thresholds</h2>
+                <div class="setting">
+                    <strong>Chế độ:</strong>
+                    <select id="mode-select" onchange="handleModeChange()">
+                        <option value="0">AUTO</option>
+                        <option value="1">ON</option>
+                        <option value="2">OFF</option>
+                        <option value="3">HALF</option>
+                        <option value="4">TIMER</option>
+                        <option value="5">MANUAL</option>
+                    </select>
+                </div>
+                
+                <div id="manual-controls-container" style="display: none;">
+                    <hr>
+                    <h4>Manual Relay Control</h4>
+                    <div class="status-grid">
+                        <div class="setting">
+                            <strong>Đèn 1:</strong>
+                            <label class="switch">
+                                <input type="checkbox" id="relay-0">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting">
+                            <strong>Đèn 2:</strong>
+                             <label class="switch">
+                                <input type="checkbox" id="relay-1">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting">
+                            <strong>Quạt 1:</strong>
+                             <label class="switch">
+                                <input type="checkbox" id="relay-2">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting">
+                            <strong>Quạt 2:</strong>
+                            <label class="switch">
+                                <input type="checkbox" id="relay-3">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting">
+                            <strong>Quạt 3:</strong>
+                             <label class="switch">
+                                <input type="checkbox" id="relay-4">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                
+                <div class="setting">
+                    <strong>Nhiệt độ Min (&deg;C):</strong>
+                    <input type="number" id="tempMin-input" step="0.5">
+                </div>
+                <div class="setting">
+                    <strong>Nhiệt độ Max (&deg;C):</strong>
+                    <input type="number" id="tempMax-input" step="0.5">
+                </div>
+                <div class="setting">
+                    <strong>Độ ẩm Min (%):</strong>
+                    <input type="number" id="humMin-input" step="1">
+                </div>
+                <div class="setting">
+                    <strong>Độ ẩm Max (%):</strong>
+                    <input type="number" id="humMax-input" step="1">
+                </div>
+                <div class="setting">
+                    <strong>Giới hạn Gas (ppm):</strong>
+                    <input type="number" id="gasLimit-input" step="10">
+                </div>
+                <div class="setting">
+                    <strong>Độ trễ Relay (s):</strong>
+                    <input type="number" id="relayDelay-input" step="1">
+                </div>
+                <button onclick="saveSettings()">Save Settings</button>
+            </div>
+            <div class="card">
+                <h2>Network Configuration</h2>
+                <div class="setting">
+                    <strong>Current SSID:</strong>
+                    <span id="current-ssid">--</span>
+                </div>
+                 <div class="setting">
+                    <strong>New SSID:</strong>
+                    <input type="text" id="wifi-ssid-input" placeholder="Enter new SSID">
+                </div>
+                 <div class="setting">
+                    <strong>New Password:</strong>
+                    <input type="password" id="wifi-pass-input" placeholder="Leave blank to keep old">
+                </div>
+                <button onclick="saveWifiSettings()">Save WiFi & Reboot</button>
+            </div>
+            <div class="card">
+                <h2>System Actions</h2>
+                <button onclick="rebootDevice()" class="btn-danger">Reboot ESP32</button>
+                <button onclick="resetWifi()" class="btn-danger" style="margin-top: 10px;">Reset WiFi Settings</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="gauge.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
